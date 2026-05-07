@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: splits
+
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/expension-splits
+    username: splits
+    password: splits
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+
+
+
+#with docker
+#spring:
+#  config:
+#    activate:
+#      on-profile: docker
+#  datasource:
+#    url: jdbc:postgresql://db:5432/splitwise_db
+
