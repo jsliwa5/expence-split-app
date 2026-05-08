@@ -12,7 +12,7 @@ spring:
         format_sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/expension-splits
+    url: jdbc:postgresql://localhost:5433/splitwise-db
     username: splits
     password: splits
 
@@ -20,6 +20,9 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+jwt:
+  secret:
+    key: YXR0ZW1wdHNjaWVudGlzdGFkdWx0d3JpdGVyY29uc2lzdHdldGNvbnNvbmFudGxlYWQ=
 
 
 

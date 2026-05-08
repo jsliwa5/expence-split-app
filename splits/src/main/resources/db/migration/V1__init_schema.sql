@@ -9,7 +9,8 @@ CREATE TABLE user_entity (
 -- 2. Grupy
 CREATE TABLE groups (
                         group_id UUID PRIMARY KEY,
-                        name VARCHAR(255) NOT NULL
+                        name VARCHAR(255) NOT NULL,
+                        join_code VARCHAR(6) UNIQUE NOT NULL -- NOWE POLE
 );
 
 -- Tabela łącząca dla @ElementCollection (membersIds) w Group
@@ -48,4 +49,12 @@ CREATE TABLE splits (
                         type VARCHAR(50) NOT NULL,
                         CONSTRAINT fk_splits_expense FOREIGN KEY (expense_id) REFERENCES expenses(expense_id) ON DELETE CASCADE,
                         CONSTRAINT fk_splits_debtor FOREIGN KEY (debtor_id) REFERENCES user_entity(user_id)
+);
+
+-- Security: Informacje o autentykacji
+CREATE TABLE security_user (
+                               user_id UUID PRIMARY KEY, -- Ten sam UUID co w user_entity
+                               email VARCHAR(255) UNIQUE NOT NULL,
+                               password_hash VARCHAR(255) NOT NULL,
+                               CONSTRAINT fk_security_user_domain FOREIGN KEY (user_id) REFERENCES user_entity(user_id) ON DELETE CASCADE
 );

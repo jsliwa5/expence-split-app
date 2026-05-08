@@ -1,24 +1,30 @@
 package com.example.splits.domain.users;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.UUID;
 
 @Entity
+@Table(name = "user_entity")
 @Getter
-@Setter
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID userId;
+
     private String firstName;
     private String lastName;
     private String username;
 
+    protected UserEntity() {}
+
+    public UserEntity(UUID userId, String firstName, String lastName, String username) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+    }
 }

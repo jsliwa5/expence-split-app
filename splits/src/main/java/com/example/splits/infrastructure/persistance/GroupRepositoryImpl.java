@@ -23,4 +23,9 @@ public class GroupRepositoryImpl implements IGroupRepository {
     public Optional<Group> findById(UUID id) {
         return jpaRepository.findById(id);
     }
+
+    @Override
+    public Optional<Group> findByJoinCode(String joinCode) {
+        return jpaRepository.findByJoinCode(joinCode);
+    }
 }
