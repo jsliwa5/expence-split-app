@@ -1,4 +1,4 @@
-package com.example.splits;
+package com.example.splits.api;
 
 import com.example.splits.api.dto.AddExpenseRequest;
 import com.example.splits.application.command.AddExpenseCommand;
