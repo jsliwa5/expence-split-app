@@ -1,38 +1,65 @@
 package com.example.splits.application.command;
 
 import com.example.splits.domain.expenses.Expense;
+import com.example.splits.domain.expenses.ExpenseItem;
 import com.example.splits.domain.expenses.IExpenseRepository;
-import com.example.splits.domain.expenses.Split;
-import com.example.splits.domain.services.SplitCalculatorDomainService;
+import com.example.splits.domain.expenses.ItemSplit;
+import com.example.splits.domain.groups.IGroupRepository;
 import com.example.splits.shared.cqrs.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AddExpenseCommandHandler implements CommandHandler<AddExpenseCommand, UUID> {
 
     private final IExpenseRepository expenseRepository;
-    private final SplitCalculatorDomainService splitCalculator;
+    private final IGroupRepository groupRepository;
 
     @Override
     @Transactional
     public UUID handle(AddExpenseCommand command) {
+
+        var group = groupRepository.findById(command.groupId())
+                .orElseThrow(() -> new IllegalArgumentException("No group with given Id " + command.groupId()));
+
+        if (!group.getMembersIds().contains(command.payerId())) {
+            throw new IllegalArgumentException("Payer does not belong to this group");
+        }
+
+        var allDebtorIds = command.items().stream()
+                .flatMap(item -> item.splits().stream())
+                .map(AddExpenseCommand.SplitCommandDto::debtorId)
+                .collect(Collectors.toSet());
+
+        for (UUID debtorId : allDebtorIds) {
+            if (!group.getMembersIds().contains(debtorId)) {
+                throw new IllegalArgumentException("Debtor with id " + debtorId + " does not belong to this group");
+            }
+        }
+
+        var expenseItems = command.items().stream()
+                .map(itemDto -> {
+                    var splits = itemDto.splits().stream()
+                            .map(splitDto -> new ItemSplit(splitDto.debtorId(), splitDto.amount()))
+                            .toList();
+
+                    return new ExpenseItem(itemDto.name(), itemDto.price(), splits);
+                })
+                .toList();
+
         var expense = new Expense(
-                command.payerId(),
                 command.groupId(),
-                command.totalAmount()
-        );
-
-        var calculatedSplits = splitCalculator.calculateEqualSplits(
+                command.payerId(),
+                command.description(),
                 command.totalAmount(),
-                command.participantsIds()
+                expenseItems
         );
 
-        expense.addSplits(calculatedSplits);
         var savedExpense = expenseRepository.save(expense);
 
         return savedExpense.getExpenseId();

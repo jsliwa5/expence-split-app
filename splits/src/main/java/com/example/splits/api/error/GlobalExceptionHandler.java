@@ -1,8 +1,10 @@
 package com.example.splits.api.error;
 
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -14,5 +16,12 @@ public class GlobalExceptionHandler {
         var error = new ErrorResponse(ex.getMessage());
 
         return ResponseEntity.badRequest().body(error.toString());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse("Invalid data format"));
     }
 }

@@ -33,8 +33,8 @@ public class GroupController {
     {
         var creatorId = user.getUserId();
         var createGroupCommand = new CreateGroupCommand(
-            creatorId,
-            createGroupRequest.name()
+                creatorId,
+                createGroupRequest.name()
         );
 
         var response = commandBus.execute(createGroupCommand);

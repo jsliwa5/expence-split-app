@@ -6,9 +6,21 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public record AddExpenseCommand(
-        UUID groupId,
+public record AddExpenseCommand (
         UUID payerId,
+        UUID groupId,
+        String description,
         BigDecimal totalAmount,
-        List<UUID> participantsIds
-) implements Command<UUID> { }
+        List<ItemCommandDto> items
+) implements Command<UUID> {
+    public record ItemCommandDto(
+            String name,
+            BigDecimal price,
+            List<SplitCommandDto> splits
+    ) {}
+
+    public record SplitCommandDto(
+            UUID debtorId,
+            BigDecimal amount
+    ) {}
+}

@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "splits")
+@Table(name = "item_splits")
 @Getter
-public class Split {
+public class ItemSplit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -18,17 +18,12 @@ public class Split {
     private UUID debtorId;
 
     @Column(nullable = false)
-    private BigDecimal owedAmount;
+    private BigDecimal amount;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private SplitType type;
+    protected ItemSplit() {} // for Hibernate
 
-    protected Split() {} //for Hibernate
-
-    public Split(UUID debtorId, BigDecimal owedAmount, SplitType type) {
+    public ItemSplit(UUID debtorId, BigDecimal amount) {
         this.debtorId = debtorId;
-        this.owedAmount = owedAmount;
-        this.type = type;
+        this.amount = amount;
     }
 }
