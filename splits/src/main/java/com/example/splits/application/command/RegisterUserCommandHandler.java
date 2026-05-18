@@ -3,7 +3,7 @@ package com.example.splits.application.command;
 import com.example.splits.domain.users.IUserRepository;
 import com.example.splits.domain.users.UserEntity;
 import com.example.splits.infrastructure.security.SecurityUserEntity;
-import com.example.splits.infrastructure.security.SecurityUserJpaRepository; // Pamiętaj o public w interfejsie!
+import com.example.splits.infrastructure.security.SecurityUserJpaRepository;
 import com.example.splits.shared.cqrs.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -9,7 +9,6 @@ import com.example.splits.shared.cqrs.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -24,21 +23,18 @@ public class AddExpenseCommandHandler implements CommandHandler<AddExpenseComman
     @Transactional
     public UUID handle(AddExpenseCommand command) {
 
-        var group = groupRepository.findById(command.groupId())
-                .orElseThrow(() -> new IllegalArgumentException("No group with given Id " + command.groupId()));
+        var groupMemberIds = groupRepository.findMemberIdsByGroupId(command.groupId());
 
-        if (!group.getMembersIds().contains(command.payerId())) {
-            throw new IllegalArgumentException("Payer does not belong to this group");
-        }
-
-        var allDebtorIds = command.items().stream()
+        var requiredUserIds = command.items().stream()
                 .flatMap(item -> item.splits().stream())
                 .map(AddExpenseCommand.SplitCommandDto::debtorId)
                 .collect(Collectors.toSet());
 
-        for (UUID debtorId : allDebtorIds) {
-            if (!group.getMembersIds().contains(debtorId)) {
-                throw new IllegalArgumentException("Debtor with id " + debtorId + " does not belong to this group");
+        requiredUserIds.add(command.payerId());
+
+        for (UUID userId : requiredUserIds) {
+            if (!groupMemberIds.contains(userId)) {
+                throw new IllegalArgumentException("User with id " + userId + " does not belong to this group");
             }
         }
 

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -32,5 +33,10 @@ public class GroupRepositoryImpl implements IGroupRepository {
     @Override
     public boolean isUserInGroup(UUID groupId, UUID userId) {
         return jpaRepository.isUserInGroup(groupId, userId);
+    }
+
+    @Override
+    public Set<UUID> findMemberIdsByGroupId(UUID groupId) {
+        return jpaRepository.findMemberIdsByGroupId(groupId);
     }
 }
