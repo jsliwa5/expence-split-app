@@ -5,16 +5,15 @@ import com.example.splits.api.dto.JoinGroupRequest;
 import com.example.splits.application.command.CreateGroupCommand;
 import com.example.splits.application.command.JoinGroupByCodeCommand;
 import com.example.splits.application.dto.CreateGroupResponse;
+import com.example.splits.application.query.GroupReadService;
+import com.example.splits.application.query.responses.GroupSummaryResponse;
 import com.example.splits.infrastructure.security.CustomUserDetails;
 import com.example.splits.shared.cqrs.CommandBus;
 import com.example.splits.shared.cqrs.QueryBus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -24,7 +23,7 @@ import java.util.UUID;
 public class GroupController {
 
     private final CommandBus commandBus;
-    private final QueryBus queryBus;
+    private final GroupReadService  groupReadService;
 
     @PostMapping()
     public ResponseEntity<CreateGroupResponse> createGroup(
@@ -53,6 +52,15 @@ public class GroupController {
         );
 
         var response = commandBus.execute(joinGroupByCodeCommand);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("{groupId}/summary")
+    public ResponseEntity<GroupSummaryResponse> getGroupSummary(@PathVariable UUID groupId,
+                                                                @AuthenticationPrincipal CustomUserDetails user) {
+        var userId = user.getUserId();
+        var response = groupReadService.getGroupSummary(groupId, userId);
+
         return ResponseEntity.ok(response);
     }
 }

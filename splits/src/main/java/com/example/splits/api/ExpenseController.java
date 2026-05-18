@@ -21,7 +21,6 @@ import java.util.UUID;
 public class ExpenseController {
 
     private final CommandBus commandBus;
-    private final QueryBus queryBus;
 
     @PostMapping
     public ResponseEntity<UUID> addExpense(

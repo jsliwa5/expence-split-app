@@ -28,4 +28,9 @@ public class GroupRepositoryImpl implements IGroupRepository {
     public Optional<Group> findByJoinCode(String joinCode) {
         return jpaRepository.findByJoinCode(joinCode);
     }
+
+    @Override
+    public boolean isUserInGroup(UUID groupId, UUID userId) {
+        return jpaRepository.isUserInGroup(groupId, userId);
+    }
 }
