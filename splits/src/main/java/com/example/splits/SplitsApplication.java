@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SplitsApplication {
 
     public static void main(String[] args) {
+        System.out.println("dupa");
         SpringApplication.run(SplitsApplication.class, args);
     }
 

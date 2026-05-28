@@ -49,6 +49,18 @@ public class Expense {
         validateInvariants();
     }
 
+    public void update(String description, BigDecimal totalAmount, List<ExpenseItem> newItems) {
+        this.description = description;
+        this.totalAmount = totalAmount;
+
+        this.items.clear();
+        if (newItems != null) {
+            this.items.addAll(newItems);
+        }
+
+        validateInvariants();
+    }
+
     public void addItem(String name, BigDecimal price, List<ItemSplit> splits) {
         var newItem = new ExpenseItem(name, price, splits);
         this.items.add(newItem);
