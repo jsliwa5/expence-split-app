@@ -69,7 +69,6 @@ public class ExpenseController {
                 request.totalAmount(),
                 itemsCommand
         );
-        System.out.println("dupa");
         commandBus.execute(command);
         return ResponseEntity.noContent().build();
     }
