@@ -9,4 +9,5 @@ public interface IExpenseRepository {
     Expense save(Expense expense);
     Optional<Expense> findById(UUID id);
     List<Expense> findAllByGroupId(UUID groupId);
+    List<Expense> findAllByGroupIdOrderByCreatedAtDesc(UUID groupId);
 }

@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface ExpenseJpaRepository extends JpaRepository<Expense, UUID> {
     List<Expense> findAllByGroupId(UUID groupId);
+
+    List<Expense> findAllByGroupIdOrderByCreatedAtDesc(UUID groupId);
 }

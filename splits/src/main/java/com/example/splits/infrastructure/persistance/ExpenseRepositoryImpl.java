@@ -29,4 +29,9 @@ public class ExpenseRepositoryImpl implements IExpenseRepository {
     public List<Expense> findAllByGroupId(UUID groupId) {
         return jpaRepository.findAllByGroupId(groupId);
     }
+
+    @Override
+    public List<Expense> findAllByGroupIdOrderByCreatedAtDesc(UUID groupId) {
+        return jpaRepository.findAllByGroupIdOrderByCreatedAtDesc(groupId);
+    }
 }
