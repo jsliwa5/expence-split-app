@@ -10,4 +10,5 @@ public interface IExpenseRepository {
     Optional<Expense> findById(UUID id);
     List<Expense> findAllByGroupId(UUID groupId);
     List<Expense> findAllByGroupIdOrderByCreatedAtDesc(UUID groupId);
+    void delete(Expense expense);
 }

@@ -3,8 +3,10 @@ package com.example.splits.api;
 import com.example.splits.api.dto.AddExpenseRequest;
 import com.example.splits.api.dto.UpdateExpenseRequest;
 import com.example.splits.application.command.AddExpenseCommand;
+import com.example.splits.application.command.DeleteExpenseCommand;
 import com.example.splits.application.command.UpdateExpenseCommand;
 import com.example.splits.application.query.ExpenseReadService;
+import com.example.splits.application.query.responses.ExpenseDetailsResponse;
 import com.example.splits.application.query.responses.ExpenseSummaryResponse;
 import com.example.splits.infrastructure.security.CustomUserDetails;
 import com.example.splits.shared.cqrs.CommandBus;
@@ -85,4 +87,26 @@ public class ExpenseController {
         var response = expenseReadService.getGroupExpenses(groupId, user.getUserId());
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{expenseId}")
+    public ResponseEntity<ExpenseDetailsResponse> getExpenseDetails(
+            @PathVariable UUID expenseId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        var response = expenseReadService.getExpenseDetails(expenseId, currentUser.getUserId());
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{expenseId}")
+    public ResponseEntity<Void> deleteExpense(
+            @PathVariable UUID expenseId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        var command = new DeleteExpenseCommand(expenseId, currentUser.getUserId());
+        commandBus.execute(command);
+
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
