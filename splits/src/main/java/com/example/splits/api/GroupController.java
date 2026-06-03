@@ -6,6 +6,7 @@ import com.example.splits.application.command.CreateGroupCommand;
 import com.example.splits.application.command.JoinGroupByCodeCommand;
 import com.example.splits.application.dto.CreateGroupResponse;
 import com.example.splits.application.query.GroupReadService;
+import com.example.splits.application.query.responses.GroupMemberResponse;
 import com.example.splits.application.query.responses.GroupSummaryResponse;
 import com.example.splits.application.query.responses.UserGroupResponse;
 import com.example.splits.infrastructure.security.CustomUserDetails;
@@ -71,6 +72,26 @@ public class GroupController {
             @AuthenticationPrincipal CustomUserDetails currentUser
     ) {
         var response = groupReadService.getUserGroups(currentUser.getUserId());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{groupId}/members")
+    public ResponseEntity<List<GroupMemberResponse>> getGroupMembers(
+            @PathVariable UUID groupId,
+            @AuthenticationPrincipal CustomUserDetails user
+    ){
+        var requesterId = user.getUserId();
+
+        var response = groupReadService.getGroupMembers(groupId, requesterId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<UserGroupResponse> getGroupDetails(
+            @PathVariable UUID groupId,
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        var response = groupReadService.getGroupDetails(groupId, currentUser.getUserId());
         return ResponseEntity.ok(response);
     }
 }

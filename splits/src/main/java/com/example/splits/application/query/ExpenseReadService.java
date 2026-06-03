@@ -2,6 +2,7 @@ package com.example.splits.application.query;
 
 import com.example.splits.application.query.responses.ExpenseDetailsResponse;
 import com.example.splits.application.query.responses.ExpenseSummaryResponse;
+import com.example.splits.application.query.responses.UserGroupResponse;
 import com.example.splits.domain.expenses.IExpenseRepository;
 import com.example.splits.domain.groups.IGroupRepository;
 import lombok.RequiredArgsConstructor;
@@ -72,4 +73,5 @@ public class ExpenseReadService {
                 itemsResponse
         );
     }
+
 }
