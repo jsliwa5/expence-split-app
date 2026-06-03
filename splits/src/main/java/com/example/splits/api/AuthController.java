@@ -5,6 +5,7 @@ import com.example.splits.application.dto.AuthResponse;
 import com.example.splits.application.query.LoginQuery;
 import com.example.splits.shared.cqrs.CommandBus;
 import com.example.splits.shared.cqrs.QueryBus;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@SecurityRequirements()
 public class AuthController {
 
     private final CommandBus commandBus;
