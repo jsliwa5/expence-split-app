@@ -5,6 +5,7 @@ import com.example.splits.domain.groups.IGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -38,5 +39,10 @@ public class GroupRepositoryImpl implements IGroupRepository {
     @Override
     public Set<UUID> findMemberIdsByGroupId(UUID groupId) {
         return jpaRepository.findMemberIdsByGroupId(groupId);
+    }
+
+    @Override
+    public Set<Group> findAllByUserId(UUID userId) {
+        return jpaRepository.findAllByUserId(userId);
     }
 }

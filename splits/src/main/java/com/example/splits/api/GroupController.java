@@ -7,6 +7,7 @@ import com.example.splits.application.command.JoinGroupByCodeCommand;
 import com.example.splits.application.dto.CreateGroupResponse;
 import com.example.splits.application.query.GroupReadService;
 import com.example.splits.application.query.responses.GroupSummaryResponse;
+import com.example.splits.application.query.responses.UserGroupResponse;
 import com.example.splits.infrastructure.security.CustomUserDetails;
 import com.example.splits.shared.cqrs.CommandBus;
 import com.example.splits.shared.cqrs.QueryBus;
@@ -15,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -61,6 +63,14 @@ public class GroupController {
         var userId = user.getUserId();
         var response = groupReadService.getGroupSummary(groupId, userId);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserGroupResponse>> getUserGroups(
+            @AuthenticationPrincipal CustomUserDetails currentUser
+    ) {
+        var response = groupReadService.getUserGroups(currentUser.getUserId());
         return ResponseEntity.ok(response);
     }
 }

@@ -17,4 +17,7 @@ public interface GroupJpaRepository extends JpaRepository<Group, UUID> {
 
     @Query(value = "SELECT user_id FROM group_members WHERE group_id = :groupId", nativeQuery = true)
     Set<UUID> findMemberIdsByGroupId(@Param("groupId") UUID groupId);
+
+    @Query(value = "SELECT g.* FROM groups g JOIN group_members gm ON g.group_id = gm.group_id WHERE gm.user_id = :userId", nativeQuery = true)
+    Set<Group> findAllByUserId(@Param("userId") UUID userId);
 }

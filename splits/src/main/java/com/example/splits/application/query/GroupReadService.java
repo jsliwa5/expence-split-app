@@ -1,8 +1,10 @@
 package com.example.splits.application.query;
 
 import com.example.splits.application.query.responses.GroupSummaryResponse;
+import com.example.splits.application.query.responses.UserGroupResponse;
 import com.example.splits.domain.expenses.Expense;
 import com.example.splits.domain.expenses.IExpenseRepository;
+import com.example.splits.domain.groups.Group;
 import com.example.splits.domain.groups.IGroupRepository;
 import com.example.splits.domain.services.SettlementDomainService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -49,5 +52,19 @@ public class GroupReadService {
 
         return new GroupSummaryResponse(transactions);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserGroupResponse> getUserGroups(UUID userId) {
+
+        var userGroups = groupRepository.findAllByUserId(userId);
+
+        return userGroups.stream()
+                .map(group -> new UserGroupResponse(
+                        group.getGroupId(),
+                        group.getName(),
+                        group.getJoinCode()
+                ))
+                .toList();
     }
 }
