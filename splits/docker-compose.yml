@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: splits-db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: splits
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: splitwise-db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: splits-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/splitwise-db
+      - SPRING_DATASOURCE_USERNAME=splits
+      - SPRING_FLYWAY_ENABLED=true
+
+volumes:
+  postgres_data:
