@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class JoincGroupByCodeCommandHandler implements CommandHandler<JoinGroupByCodeCommand, UUID> {
+public class JoinGroupByCodeCommandHandler implements CommandHandler<JoinGroupByCodeCommand, UUID> {
 
     private final IGroupRepository groupRepository;
 

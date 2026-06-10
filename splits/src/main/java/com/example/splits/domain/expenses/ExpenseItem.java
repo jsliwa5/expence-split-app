@@ -29,8 +29,29 @@ public class ExpenseItem {
     protected ExpenseItem() {} // for Hibernate
 
     public ExpenseItem(String name, BigDecimal price, List<ItemSplit> splits) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Nazwa pozycji nie może być pusta.");
+        }
+        if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Cena pozycji nie może być ujemna.");
+        }
+
         this.name = name;
         this.price = price;
-        this.splits = splits;
+        this.splits = splits != null ? splits : new ArrayList<>();
+
+        validateSplitsSum();
+    }
+
+    private void validateSplitsSum() {
+        var sumOfSplits = this.splits.stream()
+                .map(ItemSplit::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (sumOfSplits.compareTo(this.price) != 0) {
+            throw new IllegalArgumentException(
+                    "Błąd w pozycji '" + this.name + "'. Suma długów (" + sumOfSplits + ") nie równa się cenie pozycji (" + this.price + ")"
+            );
+        }
     }
 }

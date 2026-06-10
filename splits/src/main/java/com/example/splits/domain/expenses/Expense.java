@@ -80,16 +80,5 @@ public class Expense {
             );
         }
 
-        this.items.forEach(item -> {
-            var sumOfSplits = item.getSplits().stream()
-                    .map(ItemSplit::getAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            if (sumOfSplits.compareTo(item.getPrice()) != 0) {
-                throw new IllegalArgumentException(
-                        "Błąd w pozycji '" + item.getName() + "'. Suma długów (" + sumOfSplits + ") nie równa się cenie pozycji (" + item.getPrice() + ")"
-                );
-            }
-        });
     }
 }
