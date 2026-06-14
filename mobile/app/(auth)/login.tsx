@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { useAuth } from '../../src/context/AuthContext';
-import { login as loginApi } from '../../src/api/auth';
-import { theme } from '../../src/theme';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
+import { Link, useRouter } from "expo-router";
+import { useAuth } from "../../src/context/AuthContext";
+import { login as loginApi } from "../../src/api/auth";
+import { theme } from "../../src/theme";
 
 export default function LoginScreen() {
   const router = useRouter();
   const { login } = useAuth();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    setError('');
+    setError("");
 
     if (!email.trim() || !password.trim()) {
-      setError('Please fill in all fields.');
+      setError("Please fill in all fields.");
       return;
     }
 
@@ -26,9 +33,11 @@ export default function LoginScreen() {
     try {
       const response = await loginApi({ email, password });
       await login(response.token);
-      router.replace('/');
+      router.replace("/");
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+      setError(
+        err.response?.data?.message || "Invalid credentials. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -65,9 +74,9 @@ export default function LoginScreen() {
           secureTextEntry
         />
 
-        <TouchableOpacity 
-          style={[styles.button, loading && styles.buttonDisabled]} 
-          onPress={handleSubmit} 
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleSubmit}
           disabled={loading}
         >
           {loading ? (
@@ -94,16 +103,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.bgPrimary,
-    justifyContent: 'center',
+    justifyContent: "center",
     padding: theme.spacing.lg,
+    width: "100%",
+    maxWidth: 440,
+    alignSelf: "center",
   },
   header: {
     marginBottom: theme.spacing.xl,
-    alignItems: 'center',
+    alignItems: "center",
   },
   logo: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: theme.colors.accent,
     marginBottom: theme.spacing.sm,
   },
@@ -113,7 +125,7 @@ const styles = StyleSheet.create({
   },
   form: {
     backgroundColor: theme.colors.bgCard,
-    padding: theme.spacing.lg,
+    padding: theme.spacing.xl,
     borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: theme.colors.borderInput,
@@ -121,7 +133,7 @@ const styles = StyleSheet.create({
   error: {
     color: theme.colors.danger,
     marginBottom: theme.spacing.md,
-    textAlign: 'center',
+    textAlign: "center",
   },
   label: {
     color: theme.colors.textSecondary,
@@ -141,20 +153,20 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.accent,
     padding: theme.spacing.md,
     borderRadius: theme.radius.md,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: theme.spacing.sm,
   },
   buttonDisabled: {
     opacity: 0.7,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: theme.spacing.xl,
   },
   footerText: {
@@ -162,6 +174,6 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: theme.colors.accent,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });

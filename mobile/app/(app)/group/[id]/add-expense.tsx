@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Switch } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { getGroupMembers } from '../../../../src/api/groups';
-import { addExpense } from '../../../../src/api/expenses';
-import type { GroupMemberResponse, AddExpenseRequest } from '../../../../src/types';
-import { theme } from '../../../../src/theme';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  ScrollView,
+  Switch,
+} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { getGroupMembers } from "../../../../src/api/groups";
+import { addExpense } from "../../../../src/api/expenses";
+import type {
+  GroupMemberResponse,
+  AddExpenseRequest,
+} from "../../../../src/types";
+import { theme } from "../../../../src/theme";
+import * as ImagePicker from "expo-image-picker";
+import { Image, Alert } from "react-native";
 
 type SplitState = {
   selected: boolean;
@@ -21,14 +35,31 @@ type ItemState = {
 export default function AddExpenseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  
+
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [members, setMembers] = useState<GroupMemberResponse[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
   const [items, setItems] = useState<ItemState[]>([]);
+
+  const [receiptUri, setReceiptUri] = useState<string | null>(null);
+
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Błąd", "Potrzebujemy dostępu do aparatu!");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.5,
+    });
+    if (!result.canceled) {
+      setReceiptUri(result.assets[0].uri);
+    }
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -36,87 +67,111 @@ export default function AddExpenseScreen() {
     getGroupMembers(id)
       .then((m: any) => {
         setMembers(m);
-        setItems([{
-          id: Math.random().toString(),
-          name: '',
-          price: '',
-          splits: initializeSplits(m)
-        }]);
+        setItems([
+          {
+            id: Math.random().toString(),
+            name: "",
+            price: "",
+            splits: initializeSplits(m),
+          },
+        ]);
       })
-      .catch((err: any) => setError(err.response?.data?.message || 'Error loading members'))
+      .catch((err: any) =>
+        setError(err.response?.data?.message || "Error loading members"),
+      )
       .finally(() => setLoading(false));
   }, [id]);
 
-  const initializeSplits = (membersList: GroupMemberResponse[]): Record<string, SplitState> => {
+  const initializeSplits = (
+    membersList: GroupMemberResponse[],
+  ): Record<string, SplitState> => {
     const splits: Record<string, SplitState> = {};
-    membersList.forEach(m => {
-      splits[m.userId] = { selected: true, amount: '' };
+    membersList.forEach((m) => {
+      splits[m.userId] = { selected: true, amount: "" };
     });
     return splits;
   };
 
   const handleAddItem = () => {
-    setItems(prev => [
+    setItems((prev) => [
       ...prev,
       {
         id: Math.random().toString(),
-        name: '',
-        price: '',
-        splits: initializeSplits(members)
-      }
+        name: "",
+        price: "",
+        splits: initializeSplits(members),
+      },
     ]);
   };
 
   const handleRemoveItem = (itemId: string) => {
-    setItems(prev => prev.filter(item => item.id !== itemId));
+    setItems((prev) => prev.filter((item) => item.id !== itemId));
   };
 
-  const handleItemChange = (itemId: string, field: keyof ItemState, value: string) => {
-    setItems(prev => prev.map(item => 
-      item.id === itemId ? { ...item, [field]: value } : item
-    ));
+  const handleItemChange = (
+    itemId: string,
+    field: keyof ItemState,
+    value: string,
+  ) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId ? { ...item, [field]: value } : item,
+      ),
+    );
   };
 
-  const handleSplitChange = (itemId: string, debtorId: string, field: keyof SplitState, value: any) => {
-    setItems(prev => prev.map(item => {
-      if (item.id !== itemId) return item;
-      return {
-        ...item,
-        splits: {
-          ...item.splits,
-          [debtorId]: {
-            ...item.splits[debtorId],
-            [field]: value
-          }
-        }
-      };
-    }));
+  const handleSplitChange = (
+    itemId: string,
+    debtorId: string,
+    field: keyof SplitState,
+    value: any,
+  ) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
+        return {
+          ...item,
+          splits: {
+            ...item.splits,
+            [debtorId]: {
+              ...item.splits[debtorId],
+              [field]: value,
+            },
+          },
+        };
+      }),
+    );
   };
 
   const handleSplitEqually = (itemId: string) => {
-    setItems(prev => prev.map(item => {
-      if (item.id !== itemId) return item;
-      
-      const price = parseFloat(item.price) || 0;
-      const selectedDebtors = Object.entries(item.splits)
-        .filter(([_, split]) => split.selected)
-        .map(([debtorId]) => debtorId);
-      
-      if (selectedDebtors.length === 0) return item;
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== itemId) return item;
 
-      const splitAmount = Math.floor((price / selectedDebtors.length) * 100) / 100;
-      const remainder = Math.round((price - splitAmount * selectedDebtors.length) * 100) / 100;
+        const price = parseFloat(item.price) || 0;
+        const selectedDebtors = Object.entries(item.splits)
+          .filter(([_, split]) => split.selected)
+          .map(([debtorId]) => debtorId);
 
-      const newSplits = { ...item.splits };
-      selectedDebtors.forEach((debtorId, index) => {
-        newSplits[debtorId] = {
-          ...newSplits[debtorId],
-          amount: (splitAmount + (index === 0 ? remainder : 0)).toFixed(2)
-        };
-      });
+        if (selectedDebtors.length === 0) return item;
 
-      return { ...item, splits: newSplits };
-    }));
+        const splitAmount =
+          Math.floor((price / selectedDebtors.length) * 100) / 100;
+        const remainder =
+          Math.round((price - splitAmount * selectedDebtors.length) * 100) /
+          100;
+
+        const newSplits = { ...item.splits };
+        selectedDebtors.forEach((debtorId, index) => {
+          newSplits[debtorId] = {
+            ...newSplits[debtorId],
+            amount: (splitAmount + (index === 0 ? remainder : 0)).toFixed(2),
+          };
+        });
+
+        return { ...item, splits: newSplits };
+      }),
+    );
   };
 
   const calculateTotal = () => {
@@ -125,17 +180,17 @@ export default function AddExpenseScreen() {
 
   const validate = (): boolean => {
     if (!description.trim()) {
-      setError('Please enter a description.');
+      setError("Please enter a description.");
       return false;
     }
     if (items.length === 0) {
-      setError('Add at least one item.');
+      setError("Add at least one item.");
       return false;
     }
-    
+
     for (const item of items) {
       if (!item.name.trim()) {
-        setError('Each item must have a name.');
+        setError("Each item must have a name.");
         return false;
       }
       const price = parseFloat(item.price);
@@ -143,14 +198,19 @@ export default function AddExpenseScreen() {
         setError(`Invalid price for item "${item.name}".`);
         return false;
       }
-      
-      const splitsSum = Object.values(item.splits).reduce((sum, split) => sum + (parseFloat(split.amount) || 0), 0);
+
+      const splitsSum = Object.values(item.splits).reduce(
+        (sum, split) => sum + (parseFloat(split.amount) || 0),
+        0,
+      );
       if (Math.abs(splitsSum - price) > 0.01) {
-        setError(`Splits sum (${splitsSum.toFixed(2)}) does not match price (${price.toFixed(2)}) for "${item.name}". Use "Split Equally" or adjust manually.`);
+        setError(
+          `Splits sum (${splitsSum.toFixed(2)}) does not match price (${price.toFixed(2)}) for "${item.name}". Use "Split Equally" or adjust manually.`,
+        );
         return false;
       }
     }
-    
+
     setError(null);
     return true;
   };
@@ -159,28 +219,30 @@ export default function AddExpenseScreen() {
     if (!validate() || !id) return;
 
     setSubmitting(true);
-    
+
     const requestData: AddExpenseRequest = {
       groupId: id,
       description,
       totalAmount: calculateTotal(),
-      items: items.map(item => ({
+      items: items.map((item) => ({
         name: item.name,
         price: parseFloat(item.price),
         splits: Object.entries(item.splits)
-          .filter(([_, split]) => split.selected && parseFloat(split.amount) > 0)
+          .filter(
+            ([_, split]) => split.selected && parseFloat(split.amount) > 0,
+          )
           .map(([debtorId, split]) => ({
             debtorId,
-            amount: parseFloat(split.amount)
-          }))
-      }))
+            amount: parseFloat(split.amount),
+          })),
+      })),
     };
 
     try {
       await addExpense(requestData);
       router.back();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to add expense.');
+      setError(err.response?.data?.message || "Failed to add expense.");
     } finally {
       setSubmitting(false);
     }
@@ -204,6 +266,7 @@ export default function AddExpenseScreen() {
           placeholderTextColor={theme.colors.textSecondary}
           value={description}
           onChangeText={setDescription}
+          autoCapitalize="sentences"
         />
       </View>
 
@@ -233,7 +296,8 @@ export default function AddExpenseScreen() {
                 placeholder="e.g. Pizza"
                 placeholderTextColor={theme.colors.textSecondary}
                 value={item.name}
-                onChangeText={(val) => handleItemChange(item.id, 'name', val)}
+                onChangeText={(val) => handleItemChange(item.id, "name", val)}
+                autoCapitalize="words"
               />
             </View>
             <View style={{ width: theme.spacing.md }} />
@@ -244,7 +308,7 @@ export default function AddExpenseScreen() {
                 placeholder="0.00"
                 placeholderTextColor={theme.colors.textSecondary}
                 value={item.price}
-                onChangeText={(val) => handleItemChange(item.id, 'price', val)}
+                onChangeText={(val) => handleItemChange(item.id, "price", val)}
                 keyboardType="numeric"
               />
             </View>
@@ -257,26 +321,44 @@ export default function AddExpenseScreen() {
                 <Text style={styles.splitEqText}>Split Equally</Text>
               </TouchableOpacity>
             </View>
-            
-            {members.map(member => (
+
+            {members.map((member) => (
               <View key={member.userId} style={styles.splitRow}>
                 <View style={styles.splitToggle}>
                   <Switch
                     value={item.splits[member.userId]?.selected || false}
-                    onValueChange={(val) => handleSplitChange(item.id, member.userId, 'selected', val)}
-                    trackColor={{ false: theme.colors.borderInput, true: theme.colors.accentHover }}
-                    thumbColor={item.splits[member.userId]?.selected ? theme.colors.accent : '#f4f3f4'}
+                    onValueChange={(val) =>
+                      handleSplitChange(item.id, member.userId, "selected", val)
+                    }
+                    trackColor={{
+                      false: theme.colors.borderInput,
+                      true: theme.colors.accentHover,
+                    }}
+                    thumbColor={
+                      item.splits[member.userId]?.selected
+                        ? "#ffffff"
+                        : "#a0aec0"
+                    }
                   />
                   <Text style={styles.memberName}>
-                    {[member.firstName, member.lastName].filter(Boolean).join(' ') || member.username}
+                    {[member.firstName, member.lastName]
+                      .filter(Boolean)
+                      .join(" ") || member.username}
                   </Text>
                 </View>
                 <TextInput
-                  style={[styles.input, styles.splitAmountInput, !item.splits[member.userId]?.selected && styles.inputDisabled]}
+                  style={[
+                    styles.input,
+                    styles.splitAmountInput,
+                    !item.splits[member.userId]?.selected &&
+                      styles.inputDisabled,
+                  ]}
                   placeholder="0.00"
                   placeholderTextColor={theme.colors.textSecondary}
-                  value={item.splits[member.userId]?.amount || ''}
-                  onChangeText={(val) => handleSplitChange(item.id, member.userId, 'amount', val)}
+                  value={item.splits[member.userId]?.amount || ""}
+                  onChangeText={(val) =>
+                    handleSplitChange(item.id, member.userId, "amount", val)
+                  }
                   keyboardType="numeric"
                   editable={item.splits[member.userId]?.selected}
                 />
@@ -289,9 +371,11 @@ export default function AddExpenseScreen() {
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <View style={styles.footer}>
-        <Text style={styles.totalText}>Total: {calculateTotal().toFixed(2)} PLN</Text>
-        <TouchableOpacity 
-          style={[styles.submitBtn, submitting && { opacity: 0.7 }]} 
+        <Text style={styles.totalText}>
+          Total: {calculateTotal().toFixed(2)} PLN
+        </Text>
+        <TouchableOpacity
+          style={[styles.submitBtn, submitting && { opacity: 0.7 }]}
           onPress={handleSubmit}
           disabled={submitting}
         >
@@ -300,6 +384,25 @@ export default function AddExpenseScreen() {
           ) : (
             <Text style={styles.submitBtnText}>Save Expense</Text>
           )}
+        </TouchableOpacity>
+      </View>
+      <View style={styles.card}>
+        <Text style={styles.label}>Receipt (Optional)</Text>
+        {receiptUri && (
+          <Image
+            source={{ uri: receiptUri }}
+            style={{
+              width: 100,
+              height: 130,
+              borderRadius: 8,
+              marginBottom: 10,
+            }}
+          />
+        )}
+        <TouchableOpacity style={styles.addBtnSmall} onPress={takePhoto}>
+          <Text style={styles.addBtnTextSmall}>
+            📸 Take a photo of the receipt
+          </Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -312,154 +415,189 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.bgPrimary,
   },
   content: {
-    padding: theme.spacing.lg,
-    paddingBottom: theme.spacing.xxl * 2,
+    padding: 20,
+    paddingBottom: 40,
   },
   centerContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: theme.colors.bgPrimary,
   },
   card: {
     backgroundColor: theme.colors.bgCard,
-    padding: theme.spacing.lg,
-    borderRadius: theme.radius.md,
-    marginBottom: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.borderInput,
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    // Usunięto ramki na rzecz eleganckich cieni
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   label: {
     color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.xs,
-    fontSize: 14,
+    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase", // Wielkie, eleganckie litery
+    letterSpacing: 0.5,
+    marginLeft: 4,
   },
   input: {
-    backgroundColor: theme.colors.bgPrimary,
+    backgroundColor: "rgba(255, 255, 255, 0.03)", // Nowoczesne, delikatne tło inputu
     borderWidth: 1,
     borderColor: theme.colors.borderInput,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
+    borderRadius: 12,
+    padding: 16,
     color: theme.colors.textPrimary,
+    fontSize: 16,
   },
   inputDisabled: {
-    opacity: 0.5,
+    opacity: 0.3,
   },
   itemsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    marginTop: 8,
+    paddingHorizontal: 4,
   },
   itemsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: "900",
     color: theme.colors.textPrimary,
   },
   addBtnSmall: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.radius.full,
+    backgroundColor: "rgba(99, 102, 241, 0.15)", // Miękkie, fioletowe tło pastylki
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   addBtnTextSmall: {
-    color: theme.colors.textPrimary,
-    fontWeight: 'bold',
+    color: theme.colors.accent,
+    fontWeight: "700",
+    fontSize: 14,
   },
   itemCard: {
     backgroundColor: theme.colors.bgCard,
-    padding: theme.spacing.lg,
-    borderRadius: theme.radius.md,
-    marginBottom: theme.spacing.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.borderInput,
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 3,
   },
   itemHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
   },
   itemTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "800",
     color: theme.colors.textPrimary,
   },
   removeText: {
     color: theme.colors.danger,
+    fontWeight: "600",
+    fontSize: 14,
   },
   row: {
-    flexDirection: 'row',
-    marginBottom: theme.spacing.md,
+    flexDirection: "row",
+    marginBottom: 16,
   },
   flex1: {
     flex: 1,
   },
   splitsSection: {
-    marginTop: theme.spacing.md,
+    marginTop: 12,
     borderTopWidth: 1,
-    borderTopColor: theme.colors.borderInput,
-    paddingTop: theme.spacing.md,
+    borderTopColor: "rgba(255, 255, 255, 0.05)",
+    paddingTop: 16,
   },
   splitsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: theme.spacing.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
   },
   splitsTitle: {
     color: theme.colors.textPrimary,
-    fontWeight: 'bold',
+    fontWeight: "700",
+    fontSize: 16,
   },
   splitEqText: {
     color: theme.colors.accent,
+    fontWeight: "600",
+    fontSize: 14,
   },
   splitRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
   },
   splitToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   memberName: {
     color: theme.colors.textPrimary,
-    marginLeft: theme.spacing.sm,
+    marginLeft: 12, // Odsunięto lekko imię od przełącznika (Switcha)
+    fontWeight: "600",
+    fontSize: 15,
   },
   splitAmountInput: {
-    width: 100,
+    width: 110,
+    textAlign: "right", // Wyrównanie kwoty do prawej strony
+    paddingVertical: 12,
   },
   error: {
     color: theme.colors.danger,
-    marginBottom: theme.spacing.md,
-    textAlign: 'center',
+    marginBottom: 20,
+    textAlign: "center",
+    fontWeight: "600",
   },
   footer: {
     backgroundColor: theme.colors.bgCard,
-    padding: theme.spacing.lg,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.borderInput,
+    padding: 24,
+    borderRadius: 16,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 4,
   },
   totalText: {
     color: theme.colors.textPrimary,
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: theme.spacing.md,
-    textAlign: 'center',
+    fontSize: 22,
+    fontWeight: "900",
+    marginBottom: 16,
+    textAlign: "center",
   },
   submitBtn: {
     backgroundColor: theme.colors.accent,
-    padding: theme.spacing.md,
-    borderRadius: theme.radius.md,
-    alignItems: 'center',
+    padding: 16,
+    borderRadius: 14,
+    alignItems: "center",
+    shadowColor: theme.colors.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   submitBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 16,
-  }
+    letterSpacing: 0.5,
+  },
 });

@@ -1,14 +1,14 @@
 export const theme = {
   colors: {
-    bgPrimary: '#0b0d17',
-    bgSecondary: '#111327',
-    bgCard: '#161933',
-    textPrimary: '#f0f0f5',
-    textSecondary: '#8b8fa3',
-    accent: '#10b981',
-    accentHover: '#059669',
-    danger: '#ef4444',
-    borderInput: 'rgba(255, 255, 255, 0.1)',
+    bgPrimary: "#0F172A",
+    bgSecondary: "#1E293B",
+    bgCard: "#1E293B",
+    textPrimary: "#F1F5F9",
+    textSecondary: "#94A3B8",
+    accent: "#6366F1",
+    accentHover: "#4F46E5",
+    danger: "#F87171",
+    borderInput: "#334155",
   },
   spacing: {
     xs: 4,
@@ -23,5 +23,5 @@ export const theme = {
     md: 12,
     lg: 16,
     full: 9999,
-  }
+  },
 };
