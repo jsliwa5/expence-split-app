@@ -7,9 +7,9 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_USER: splits
+      POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: splitwise-db
+      POSTGRES_DB: splits
     ports:
       - "5433:5432"
     volumes:
@@ -25,7 +25,7 @@ services:
     env_file:
       - .env
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/splitwise-db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/splits
       - SPRING_DATASOURCE_USERNAME=splits
       - SPRING_FLYWAY_ENABLED=true
 
