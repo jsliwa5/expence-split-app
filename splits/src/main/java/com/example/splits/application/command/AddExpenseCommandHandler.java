@@ -5,10 +5,15 @@ import com.example.splits.domain.expenses.ExpenseItem;
 import com.example.splits.domain.expenses.IExpenseRepository;
 import com.example.splits.domain.expenses.ItemSplit;
 import com.example.splits.domain.groups.IGroupRepository;
+import com.example.splits.infrastructure.security.SecurityUserJpaRepository;
+import com.example.splits.infrastructure.services.NotificationService;
 import com.example.splits.shared.cqrs.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -18,6 +23,9 @@ public class AddExpenseCommandHandler implements CommandHandler<AddExpenseComman
 
     private final IExpenseRepository expenseRepository;
     private final IGroupRepository groupRepository;
+
+    private final SecurityUserJpaRepository securityUserRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -57,6 +65,24 @@ public class AddExpenseCommandHandler implements CommandHandler<AddExpenseComman
         );
 
         var savedExpense = expenseRepository.save(expense);
+
+
+        Set<UUID> usersToNotifyIds = groupMemberIds.stream()
+                .filter(memberId -> !memberId.equals(command.payerId()))
+                .collect(Collectors.toSet());
+
+        if (!usersToNotifyIds.isEmpty()) {
+            List<String> tokens = securityUserRepository.findFcmTokensByUserIds(usersToNotifyIds);
+
+            if (!tokens.isEmpty()) {
+                String title = "Nowy wydatek!";
+                String body = "Dodano wydatek: " + command.description() + " na kwotę " + command.totalAmount() + " zł.";
+
+                for (String token : tokens) {
+                    notificationService.sendPushNotification(token, title, body);
+                }
+            }
+        }
 
         return savedExpense.getExpenseId();
     }
