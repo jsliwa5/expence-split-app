@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,19 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() {
         try {
-            InputStream serviceAccount = new FileInputStream("firebase-service-account.json");
+            // 1. Sprawdzamy, czy aplikacja działa w chmurze Render
+            File renderSecretFile = new File("/etc/secrets/firebase-service-account.json");
+            InputStream serviceAccount;
+
+            if (renderSecretFile.exists()) {
+                // Środowisko produkcyjne (Render)
+                serviceAccount = new FileInputStream(renderSecretFile);
+                System.out.println("☁️ Wczytano plik konfiguracyjny Firebase z chmury Render.");
+            } else {
+                // Środowisko lokalne (Twój komputer)
+                serviceAccount = new FileInputStream("firebase-service-account.json");
+                System.out.println("💻 Wczytano lokalny plik konfiguracyjny Firebase.");
+            }
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
