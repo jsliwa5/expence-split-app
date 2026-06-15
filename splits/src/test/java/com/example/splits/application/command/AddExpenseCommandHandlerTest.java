@@ -50,7 +50,7 @@ class AddExpenseCommandHandlerTest {
         var splitDto = new AddExpenseCommand.SplitCommandDto(debtorId, new BigDecimal("100.00"));
         var itemDto = new AddExpenseCommand.ItemCommandDto("Zakupy", new BigDecimal("100.00"), List.of(splitDto));
 
-        var command = new AddExpenseCommand(payerId, groupId, "Opis", new BigDecimal("100.00"), List.of(itemDto));
+        var command = new AddExpenseCommand(payerId, groupId, "Opis", new BigDecimal("100.00"),"randomurl", List.of(itemDto));
 
         when(groupRepository.findMemberIdsByGroupId(groupId)).thenReturn(Set.of(payerId, debtorId));
         lenient().when(securityUserRepository.findFcmTokensByUserIds(any())).thenReturn(List.of());
@@ -75,7 +75,7 @@ class AddExpenseCommandHandlerTest {
         var splitDto = new AddExpenseCommand.SplitCommandDto(strangerId, new BigDecimal("100.00"));
         var itemDto = new AddExpenseCommand.ItemCommandDto("Zakupy", new BigDecimal("100.00"), List.of(splitDto));
 
-        var command = new AddExpenseCommand(payerId, groupId, "Opis", new BigDecimal("100.00"), List.of(itemDto));
+        var command = new AddExpenseCommand(payerId, groupId, "Opis", new BigDecimal("100.00"),"randomurl", List.of(itemDto));
 
         when(groupRepository.findMemberIdsByGroupId(groupId)).thenReturn(Set.of(payerId));
 

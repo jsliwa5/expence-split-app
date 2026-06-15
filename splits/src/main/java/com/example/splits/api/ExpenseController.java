@@ -46,6 +46,7 @@ public class ExpenseController {
                 request.groupId(),
                 request.description(),
                 request.totalAmount(),
+                request.receiptUrl(),
                 itemsCommand
         );
 
@@ -73,6 +74,7 @@ public class ExpenseController {
                 currentUser.getUserId(),
                 request.description(),
                 request.totalAmount(),
+                request.receiptUrl(),
                 itemsCommand
         );
         commandBus.execute(command);
