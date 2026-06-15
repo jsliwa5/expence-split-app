@@ -20,6 +20,7 @@ export default function RegisterScreen() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -51,14 +52,17 @@ export default function RegisterScreen() {
 
     setLoading(true);
     try {
-      await registerApi({ firstName, lastName, username, email, password });
+      await registerApi({ firstName, lastName, username, phoneNumber, email, password });
       const loginResponse = await loginApi({ email, password });
       await login(loginResponse.token);
       router.replace("/");
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || "Registration failed. Please try again.",
-      );
+      console.log("REGISTER ERROR:", JSON.stringify(err?.response?.data), "STATUS:", err?.response?.status, "MSG:", err?.message);
+      const msg = err.response?.data?.message
+        || (typeof err.response?.data === "string" ? err.response.data : null)
+        || err.message
+        || "Registration failed. Please try again.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -109,6 +113,16 @@ export default function RegisterScreen() {
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
+          />
+
+          <Text style={styles.label}>Phone Number (BLIK)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="123 456 789"
+            placeholderTextColor={theme.colors.textSecondary}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+            keyboardType="phone-pad"
           />
 
           <Text style={styles.label}>Email</Text>

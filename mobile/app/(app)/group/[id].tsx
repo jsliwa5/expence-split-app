@@ -7,6 +7,7 @@ import {
   FlatList,
   ActivityIndicator,
   Alert,
+  TextInput,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -209,6 +210,33 @@ export default function GroupDetailScreen() {
               </Text>
             </View>
             <Text style={styles.balanceAmount}>{formatAmount(t.amount)}</Text>
+          </View>
+          
+          <View style={styles.settleContainer}>
+            <View style={styles.blikInfo}>
+              <Text style={styles.blikLabel}>BLIK Phone Transfer:</Text>
+              <TextInput
+                style={[styles.blikInput, { textAlign: "left", letterSpacing: 1 }]}
+                placeholder="No phone number"
+                placeholderTextColor={theme.colors.textSecondary}
+                value={members.find(m => m.userId === t.toUserId)?.phoneNumber || ""}
+                editable={false}
+              />
+            </View>
+            <TouchableOpacity 
+              style={styles.settleBtn} 
+              onPress={() => {
+                const phone = members.find(m => m.userId === t.toUserId)?.phoneNumber;
+                if (phone) {
+                  Clipboard.setStringAsync(phone);
+                  Alert.alert("Copied!", "Phone number copied to clipboard. Open your banking app to send a BLIK transfer.");
+                } else {
+                  Alert.alert("No number", "This user hasn't added a phone number yet.");
+                }
+              }}
+            >
+              <Text style={styles.settleBtnText}>Copy & Settle</Text>
+            </TouchableOpacity>
           </View>
         </View>
       ));
@@ -441,6 +469,49 @@ const styles = StyleSheet.create({
   },
   memberUsername: {
     color: theme.colors.textSecondary,
+    fontSize: 14,
+  },
+  settleContainer: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255, 255, 255, 0.05)",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  blikInfo: {
+    flex: 1,
+  },
+  blikLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: 12,
+    marginBottom: 6,
+    fontWeight: "600",
+    textTransform: "uppercase",
+  },
+  blikInput: {
+    backgroundColor: "rgba(255, 255, 255, 0.03)",
+    borderWidth: 1,
+    borderColor: theme.colors.borderInput,
+    borderRadius: 10,
+    padding: 12,
+    color: theme.colors.textPrimary,
+    fontSize: 15,
+  },
+  settleBtn: {
+    backgroundColor: theme.colors.accent,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    height: 46,
+  },
+  settleBtnText: {
+    color: "#fff",
+    fontWeight: "700",
     fontSize: 14,
   },
 });

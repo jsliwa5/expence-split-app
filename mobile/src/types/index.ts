@@ -8,6 +8,7 @@ export interface RegisterRequest {
   lastName: string;
   username: string;
   email: string;
+  phoneNumber?: string;
   password: string;
 }
 
@@ -44,6 +45,7 @@ export interface GroupMemberResponse {
   firstName: string;
   lastName: string;
   username: string;
+  phoneNumber?: string;
 }
 
 export interface DebtTransaction {
