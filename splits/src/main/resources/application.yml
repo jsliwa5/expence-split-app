@@ -12,8 +12,8 @@ spring:
         format_sql: true
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/splitwise-db
-    username: splits
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
   flyway:
