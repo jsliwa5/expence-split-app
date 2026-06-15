@@ -65,6 +65,7 @@ export interface ExpenseSummaryResponse {
   description: string;
   totalAmount: number;
   createdAt: string;
+  receiptUrl?: string;
 }
 
 export interface SplitDetails {
@@ -86,6 +87,7 @@ export interface ExpenseDetailsResponse {
   description: string;
   totalAmount: number;
   createdAt: string;
+  receiptUrl?: string;
   items: ItemDetails[];
 }
 
@@ -99,11 +101,13 @@ export interface AddExpenseRequest {
   groupId: string;
   description: string;
   totalAmount: number;
+  receiptUrl?: string;
   items: AddExpenseItem[];
 }
 
 export interface UpdateExpenseRequest {
   description: string;
   totalAmount: number;
+  receiptUrl?: string;
   items: AddExpenseItem[];
 }

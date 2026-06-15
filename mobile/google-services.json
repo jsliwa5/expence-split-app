@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "333504360552",
+    "project_id": "splits-app-7a469",
+    "storage_bucket": "splits-app-7a469.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333504360552:android:7cab6c5c872471c121cbdd",
+        "android_client_info": {
+          "package_name": "com.splits.splits"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEac-S2uC8ioCB4yCJs-ijr8rC0LBQD-Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

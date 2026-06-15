@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
+  Image,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -169,10 +170,18 @@ export default function GroupDetailScreen() {
       return expenses.map((expense) => (
         <View key={expense.expenseId} style={styles.card}>
           <View style={styles.expenseMain}>
-            <Text style={styles.expenseTitle}>{expense.description}</Text>
-            <Text style={styles.expenseAmount}>
-              {formatAmount(expense.totalAmount)}
-            </Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.expenseTitle}>{expense.description}</Text>
+              <Text style={styles.expenseAmount}>
+                {formatAmount(expense.totalAmount)}
+              </Text>
+            </View>
+            {expense.receiptUrl ? (
+              <Image
+                source={{ uri: expense.receiptUrl }}
+                style={styles.receiptThumbnail}
+              />
+            ) : null}
           </View>
           <View style={styles.expenseSub}>
             <Text style={styles.expensePayer}>
@@ -393,6 +402,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "900",
     color: theme.colors.textPrimary,
+  },
+  receiptThumbnail: {
+    width: 50,
+    height: 65,
+    borderRadius: 8,
+    marginLeft: 10,
   },
   expenseSub: {
     flexDirection: "row",

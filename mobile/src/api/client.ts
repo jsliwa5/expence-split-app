@@ -9,22 +9,8 @@ import { Platform } from "react-native";
 // from Expo's manifest so the device can reach the backend.
 // For emulators, we use the standard loopback addresses.
 function getBaseURL(): string {
-  // Try to extract dev machine IP from Expo's debuggerHost (works in Expo Go)
-  const debuggerHost =
-    Constants.expoConfig?.hostUri ??
-    Constants.manifest2?.extra?.expoGo?.debuggerHost ??
-    Constants.manifest?.debuggerHost;
-
-  if (debuggerHost) {
-    const host = debuggerHost.split(":")[0]; // strip port
-    return `http://${host}:8080`;
-  }
-
-  // Fallback for emulators
-  if (Platform.OS === "android") {
-    return "http://10.0.2.2:8080";
-  }
-  return "http://localhost:8080";
+  // Return the production Render URL
+  return "https://expence-split-app.onrender.com";
 }
 
 const client = axios.create({

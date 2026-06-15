@@ -10,3 +10,7 @@ export async function login(data: LoginRequest): Promise<AuthResponse> {
   const response = await client.post<AuthResponse>('/api/auth/login', data);
   return response.data;
 }
+
+export async function registerFCMToken(fcmToken: string): Promise<void> {
+  await client.put('/api/users/fcm-token', { fcmToken });
+}

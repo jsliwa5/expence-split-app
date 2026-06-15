@@ -19,6 +19,7 @@ import type {
 import { theme } from "../../../../src/theme";
 import * as ImagePicker from "expo-image-picker";
 import { Image, Alert } from "react-native";
+import { uploadReceiptAndGetUrl } from "../../../../src/services/storage";
 
 type SplitState = {
   selected: boolean;
@@ -220,25 +221,34 @@ export default function AddExpenseScreen() {
 
     setSubmitting(true);
 
-    const requestData: AddExpenseRequest = {
-      groupId: id,
-      description,
-      totalAmount: calculateTotal(),
-      items: items.map((item) => ({
-        name: item.name,
-        price: parseFloat(item.price),
-        splits: Object.entries(item.splits)
-          .filter(
-            ([_, split]) => split.selected && parseFloat(split.amount) > 0,
-          )
-          .map(([debtorId, split]) => ({
-            debtorId,
-            amount: parseFloat(split.amount),
-          })),
-      })),
-    };
-
     try {
+      let receiptUrl: string | undefined = undefined;
+      if (receiptUri) {
+        const uploadedUrl = await uploadReceiptAndGetUrl(receiptUri);
+        if (uploadedUrl) {
+          receiptUrl = uploadedUrl;
+        }
+      }
+
+      const requestData: AddExpenseRequest = {
+        groupId: id,
+        description,
+        totalAmount: calculateTotal(),
+        receiptUrl,
+        items: items.map((item) => ({
+          name: item.name,
+          price: parseFloat(item.price),
+          splits: Object.entries(item.splits)
+            .filter(
+              ([_, split]) => split.selected && parseFloat(split.amount) > 0,
+            )
+            .map(([debtorId, split]) => ({
+              debtorId,
+              amount: parseFloat(split.amount),
+            })),
+        })),
+      };
+
       await addExpense(requestData);
       router.back();
     } catch (err: any) {

@@ -9,6 +9,7 @@ import {
 import { jwtDecode } from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User, JwtPayload } from '../types';
+import { setupFCM } from '../services/firebaseSetup';
 
 // ── Context shape ────────────────────────────────────
 interface AuthContextValue {
@@ -51,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const decoded = decodeToken(stored);
           if (decoded) {
             setUser(decoded);
+            setupFCM();
           } else {
             await AsyncStorage.removeItem('token');
           }
@@ -68,6 +70,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem('token', token);
     const decoded = decodeToken(token);
     setUser(decoded);
+    if (decoded) {
+      setupFCM();
+    }
   }, []);
 
   const logout = useCallback(async () => {

@@ -7,7 +7,9 @@
     "icon": "./assets/icon.png",
     "scheme": "expencesplit",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-firebase/app",
+      "expo-dev-client"
     ],
     "userInterfaceStyle": "dark",
     "splash": {
@@ -19,6 +21,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.splits.splits",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#0F172A",
         "foregroundImage": "./assets/android-icon-foreground.png",
