@@ -3,6 +3,8 @@ package com.example.splits.application.command;
 import com.example.splits.domain.expenses.Expense;
 import com.example.splits.domain.expenses.IExpenseRepository;
 import com.example.splits.domain.groups.IGroupRepository;
+import com.example.splits.infrastructure.security.SecurityUserJpaRepository;
+import com.example.splits.infrastructure.services.NotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,13 +31,18 @@ class AddExpenseCommandHandlerTest {
     @Mock
     private IGroupRepository groupRepository;
 
+    @Mock
+    private SecurityUserJpaRepository securityUserRepository;
+
+    @Mock
+    private NotificationService notificationService;
+
     @InjectMocks
     private AddExpenseCommandHandler handler;
 
     @Test
     @DisplayName("Powinien dodać wydatek, gdy wszyscy użytkownicy należą do grupy")
     void shouldAddExpenseWhenAllUsersInGroup() {
-        // GIVEN
         UUID payerId = UUID.randomUUID();
         UUID groupId = UUID.randomUUID();
         UUID debtorId = UUID.randomUUID();
@@ -46,15 +53,14 @@ class AddExpenseCommandHandlerTest {
         var command = new AddExpenseCommand(payerId, groupId, "Opis", new BigDecimal("100.00"), List.of(itemDto));
 
         when(groupRepository.findMemberIdsByGroupId(groupId)).thenReturn(Set.of(payerId, debtorId));
+        lenient().when(securityUserRepository.findFcmTokensByUserIds(any())).thenReturn(List.of());
 
         Expense savedExpense = mock(Expense.class);
         when(savedExpense.getExpenseId()).thenReturn(UUID.randomUUID());
         when(expenseRepository.save(any(Expense.class))).thenReturn(savedExpense);
 
-        // WHEN
         UUID resultId = handler.handle(command);
 
-        // THEN
         assertNotNull(resultId);
         verify(expenseRepository, times(1)).save(any(Expense.class));
     }
@@ -62,7 +68,6 @@ class AddExpenseCommandHandlerTest {
     @Test
     @DisplayName("Powinien rzucić wyjątek, gdy dłużnik nie należy do grupy")
     void shouldThrowExceptionWhenDebtorNotInGroup() {
-        // GIVEN
         UUID payerId = UUID.randomUUID();
         UUID groupId = UUID.randomUUID();
         UUID strangerId = UUID.randomUUID();
@@ -74,7 +79,6 @@ class AddExpenseCommandHandlerTest {
 
         when(groupRepository.findMemberIdsByGroupId(groupId)).thenReturn(Set.of(payerId));
 
-        // WHEN & THEN
         assertThrows(IllegalArgumentException.class, () -> handler.handle(command));
         verify(expenseRepository, never()).save(any(Expense.class));
     }
