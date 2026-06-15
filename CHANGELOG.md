@@ -8,7 +8,7 @@ Wszystkie istotne zmiany i kamienie milowe w rozwoju aplikacji mobilnej Splits.
 * **Funkcja Natywna 2:** System powiadomień push powiadamiający dłużników o zaległościach finansowych (`jsliwa5`, `salsa`).
 * Niestandardowy podział wydatków w formularzu (kwotowy/procentowy) (`salsa`).
 * Funkcja kopiowania unikalnego kodu grupy do schowka systemowego (`salsa`).
-* Obsługa stanów awaryjnych aplikacji (tryb offline, brak internetu, błędy walidacji) (`salsa`).
+* Obsługa stanów awaryjnych aplikacji (błędy walidacji) (`salsa`).
 * **Design System:** Implementacja globalnego motywu Dark Mode i ujednolicenie UI (`konfederakf`, `salsa`).
 
 ### Zmieniono / Poprawiono
