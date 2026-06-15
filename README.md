@@ -12,7 +12,6 @@ Aplikacja automatycznie przelicza bilanse, obsługuje zaokrąglenia groszowe, a 
 * **Autoryzacja (Auth):** Bezpieczna rejestracja i logowanie użytkowników oparte o tokeny JWT.
 * **Zarządzanie grupami:** Tworzenie grup rozliczeniowych i generowanie unikalnych kodów dostępu dla znajomych.
 * **Podział podstawowy:** Dodawanie wydatków kwotowych i automatyczny, równy podział kosztów na wszystkich członków.
-* **Algorytm bilansów:** Obliczanie optymalnej ścieżki zwrotu gotówki minimalną liczbą przelewów między uczestnikami.
 
 ### Funkcje Natywne Smartfona (Rozszerzenia)
 1. **Skaner paragonów (Aparat & Galeria):** Wykorzystanie natywnego Camera API (poprzez Expo Image Picker) do robienia zdjęć paragonów i przypisywania ich jako dowód zakupu (`receiptUrl`).
@@ -52,7 +51,7 @@ Aplikacja automatycznie przelicza bilanse, obsługuje zaokrąglenia groszowe, a 
 ├── TESTS.md              # Dokumentacja przeprowadzonych testów integracyjnych
 ├── PRIVACY_POLICY.md     # Polityka prywatności wymagana przez Google Play
 └── PLAY_STORE.md         # Specyfikacja publikacji i materiały graficzne
-
+```
 # Instrukcja uruchomienia i wdrożenia systemu Splits
 ---
 
