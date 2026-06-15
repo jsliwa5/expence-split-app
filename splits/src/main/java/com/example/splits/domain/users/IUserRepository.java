@@ -9,4 +9,5 @@ public interface IUserRepository {
     Optional<UserEntity> findById(UUID id);
     Optional<UserEntity> findByUsername(String username);
     Set<UserEntity> findUsersByGroupId(UUID groupId);
+    Optional<UserEntity> findByPhoneNumber(String phoneNumber);
 }

@@ -14,4 +14,7 @@ public interface UserEntityJpaRepository extends JpaRepository<UserEntity, UUID>
 
     @Query(value = "SELECT u.* FROM user_entity u JOIN group_members gm ON u.user_id = gm.user_id WHERE gm.group_id = :groupId", nativeQuery = true)
     Set<UserEntity> findUsersByGroupId(@Param("groupId") UUID groupId);
+
+    Optional<UserEntity> findByPhoneNumber(String phoneNumber);
+
 }

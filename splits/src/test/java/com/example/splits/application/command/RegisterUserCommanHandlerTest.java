@@ -39,7 +39,7 @@ class RegisterUserCommandHandlerTest {
     @DisplayName("Powinien zarejestrować użytkownika i zapisać w obu repozytoriach")
     void shouldRegisterUserSuccessfully() {
         // GIVEN
-        var command = new RegisterUserCommand("Jan", "Kowalski", "jankowalski", "jan@test.com", "Haslo123");
+        var command = new RegisterUserCommand("Jan", "Kowalski", "jankowalski", "jan@test.com", "Haslo123", "123456789");
 
         when(securityRepository.findByEmail(command.email())).thenReturn(Optional.empty());
         when(userRepository.findByUsername(command.username())).thenReturn(Optional.empty());
@@ -58,7 +58,7 @@ class RegisterUserCommandHandlerTest {
     @DisplayName("Powinien zablokować rejestrację, gdy email jest już zajęty")
     void shouldThrowExceptionWhenEmailIsTaken() {
         // GIVEN
-        var command = new RegisterUserCommand("Jan", "Kowalski", "jankowalski", "zajety@test.com", "Haslo123");
+        var command = new RegisterUserCommand("Jan", "Kowalski", "jankowalski", "zajety@test.com", "Haslo123", "123456789");
 
         when(securityRepository.findByEmail(command.email())).thenReturn(Optional.of(mock(SecurityUserEntity.class)));
 

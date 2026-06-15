@@ -34,4 +34,9 @@ public class UserRepositoryImpl implements IUserRepository {
     public Set<UserEntity> findUsersByGroupId(UUID groupId) {
         return jpaRepository.findUsersByGroupId(groupId);
     }
+
+    @Override
+    public Optional<UserEntity> findByPhoneNumber(String phoneNumber) {
+        return jpaRepository.findByPhoneNumber(phoneNumber);
+    }
 }

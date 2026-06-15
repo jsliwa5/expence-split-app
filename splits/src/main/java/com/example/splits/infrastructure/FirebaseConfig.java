@@ -5,7 +5,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,7 +27,7 @@ public class FirebaseConfig {
                 System.out.println("☁️ Wczytano plik konfiguracyjny Firebase z chmury Render.");
             } else {
                 // Środowisko lokalne (Twój komputer)
-                serviceAccount = new FileInputStream("firebase-service-account.json");
+                serviceAccount = new FileInputStream("com/example/splits/firebase-service-account.json");
                 System.out.println("💻 Wczytano lokalny plik konfiguracyjny Firebase.");
             }
 

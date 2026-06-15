@@ -8,5 +8,6 @@ public record RegisterUserCommand(
         String lastName,
         String username,
         String email,
-        String password
+        String password,
+        String phoneNumber
 ) implements Command<UUID> {}

@@ -1,0 +1,1 @@
+ALTER TABLE user_entity ADD COLUMN phone_number VARCHAR(20);

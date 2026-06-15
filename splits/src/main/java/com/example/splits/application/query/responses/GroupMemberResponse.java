@@ -6,5 +6,6 @@ public record GroupMemberResponse(
         UUID userId,
         String firstName,
         String lastName,
-        String username
+        String username,
+        String phoneNumber
 ) {}

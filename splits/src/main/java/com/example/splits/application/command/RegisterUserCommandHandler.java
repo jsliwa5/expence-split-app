@@ -31,6 +31,9 @@ public class RegisterUserCommandHandler implements CommandHandler<RegisterUserCo
         if (userRepository.findByUsername(command.username()).isPresent()) {
             throw new IllegalArgumentException("this username is already registered");
         }
+        if (userRepository.findByPhoneNumber(command.phoneNumber()).isPresent()) {
+            throw new IllegalArgumentException("This phone number is already registered");
+        }
 
         var sharedUserId = UUID.randomUUID();
 
@@ -38,7 +41,8 @@ public class RegisterUserCommandHandler implements CommandHandler<RegisterUserCo
                 sharedUserId,
                 command.firstName(),
                 command.lastName(),
-                command.username()
+                command.username(),
+                command.phoneNumber()
         );
         userRepository.save(userEntity);
 

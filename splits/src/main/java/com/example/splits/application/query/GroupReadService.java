@@ -85,7 +85,8 @@ public class GroupReadService {
                         user.getUserId(),
                         user.getFirstName(),
                         user.getLastName(),
-                        user.getUsername()
+                        user.getUsername(),
+                        user.getPhoneNumber()
                 ))
                 .toList();
     }
