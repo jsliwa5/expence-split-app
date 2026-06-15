@@ -9,7 +9,8 @@
     "plugins": [
       "expo-router",
       "@react-native-firebase/app",
-      "expo-dev-client"
+      "expo-dev-client",
+      "expo-notifications"
     ],
     "userInterfaceStyle": "dark",
     "splash": {

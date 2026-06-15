@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
   Image,
 } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
 import {
   getGroupDetails,
   getGroupMembers,
@@ -49,24 +49,26 @@ export default function GroupDetailScreen() {
     return map;
   }, [members]);
 
-  useEffect(() => {
-    if (!id) return;
-    setLoading(true);
-    Promise.all([
-      getGroupDetails(id),
-      getGroupMembers(id),
-      getGroupSummary(id),
-      getGroupExpenses(id),
-    ])
-      .then(([g, m, s, e]) => {
-        setGroup(g);
-        setMembers(m);
-        setSummary(s);
-        setExpenses(e);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (!id) return;
+      setLoading(true);
+      Promise.all([
+        getGroupDetails(id),
+        getGroupMembers(id),
+        getGroupSummary(id),
+        getGroupExpenses(id),
+      ])
+        .then(([g, m, s, e]) => {
+          setGroup(g);
+          setMembers(m);
+          setSummary(s);
+          setExpenses(e);
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }, [id])
+  );
 
   const handleCopyCode = async () => {
     if (!group) return;
@@ -168,7 +170,11 @@ export default function GroupDetailScreen() {
         return <Text style={styles.emptyText}>No expenses yet.</Text>;
       }
       return expenses.map((expense) => (
-        <View key={expense.expenseId} style={styles.card}>
+        <TouchableOpacity 
+          key={expense.expenseId} 
+          style={styles.card}
+          onPress={() => router.push(`/(app)/expense/${expense.expenseId}` as any)}
+        >
           <View style={styles.expenseMain}>
             <View style={{ flex: 1 }}>
               <Text style={styles.expenseTitle}>{expense.description}</Text>
@@ -188,7 +194,10 @@ export default function GroupDetailScreen() {
               Paid by {names[expense.payerId] || "Unknown"}
             </Text>
             <TouchableOpacity
-              onPress={() => handleDeleteExpense(expense.expenseId)}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleDeleteExpense(expense.expenseId);
+              }}
               disabled={deletingId === expense.expenseId}
             >
               {deletingId === expense.expenseId ? (
@@ -198,7 +207,7 @@ export default function GroupDetailScreen() {
               )}
             </TouchableOpacity>
           </View>
-        </View>
+        </TouchableOpacity>
       ));
     }
 
