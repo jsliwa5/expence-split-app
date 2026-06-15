@@ -58,7 +58,8 @@ public class UpdateExpenseCommandHandler implements CommandHandler<UpdateExpense
         expense.update(
                 command.description(),
                 command.totalAmount(),
-                newExpenseItems
+                newExpenseItems,
+                command.receiptUrl()
         );
 
         expenseRepository.save(expense);

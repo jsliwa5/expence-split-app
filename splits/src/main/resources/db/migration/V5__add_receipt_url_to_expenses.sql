@@ -1,0 +1,1 @@
+ALTER TABLE expenses ADD COLUMN receipt_url VARCHAR(1024);

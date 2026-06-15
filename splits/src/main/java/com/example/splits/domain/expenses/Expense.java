@@ -32,6 +32,9 @@ public class Expense {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "receipt_url", length = 1024)
+    private String receiptUrl;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "expense_id", nullable = false, updatable = false)
     private List<ExpenseItem> items = new ArrayList<>();
@@ -45,13 +48,29 @@ public class Expense {
         this.totalAmount = totalAmount;
         this.items = items != null ? items : new ArrayList<>();
         this.createdAt = LocalDateTime.now();
+        this.receiptUrl = null;
 
         validateInvariants();
     }
 
-    public void update(String description, BigDecimal totalAmount, List<ExpenseItem> newItems) {
+    public Expense(UUID groupId, UUID payerId, String description, BigDecimal totalAmount, List<ExpenseItem> items, String receiptUrl) {
+        this.groupId = groupId;
+        this.payerId = payerId;
         this.description = description;
         this.totalAmount = totalAmount;
+        this.items = items != null ? items : new ArrayList<>();
+        this.createdAt = LocalDateTime.now();
+        this.receiptUrl = receiptUrl;
+
+        validateInvariants();
+    }
+
+
+
+    public void update(String description, BigDecimal totalAmount, List<ExpenseItem> newItems, String  receiptUrl) {
+        this.description = description;
+        this.totalAmount = totalAmount;
+        this.receiptUrl = receiptUrl;
 
         this.items.clear();
         if (newItems != null) {

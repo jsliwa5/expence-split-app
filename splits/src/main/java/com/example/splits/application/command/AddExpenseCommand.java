@@ -11,6 +11,7 @@ public record AddExpenseCommand (
         UUID groupId,
         String description,
         BigDecimal totalAmount,
+        String receiptUrl,
         List<ItemCommandDto> items
 ) implements Command<UUID> {
     public record ItemCommandDto(

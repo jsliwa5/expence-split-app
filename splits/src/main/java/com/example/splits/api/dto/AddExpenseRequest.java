@@ -8,6 +8,7 @@ public record AddExpenseRequest(
         UUID groupId,
         String description,
         BigDecimal totalAmount,
+        String receiptUrl,
         List<ItemRequestDto> items
 ) {
     public record ItemRequestDto(

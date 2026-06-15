@@ -69,6 +69,7 @@ public class ExpenseReadService {
                 expense.getPayerId(),
                 expense.getDescription(),
                 expense.getTotalAmount(),
+                expense.getReceiptUrl(), // <-- POBIERAMY URL Z ENCJI
                 expense.getCreatedAt(),
                 itemsResponse
         );

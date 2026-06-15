@@ -61,7 +61,8 @@ public class AddExpenseCommandHandler implements CommandHandler<AddExpenseComman
                 command.payerId(),
                 command.description(),
                 command.totalAmount(),
-                expenseItems
+                expenseItems,
+                command.receiptUrl()
         );
 
         var savedExpense = expenseRepository.save(expense);

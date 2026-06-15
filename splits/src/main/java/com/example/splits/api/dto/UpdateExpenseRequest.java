@@ -7,6 +7,7 @@ import java.util.UUID;
 public record UpdateExpenseRequest(
         String description,
         BigDecimal totalAmount,
+        String receiptUrl,
         List<ItemRequestDto> items
 ) {
     public record ItemRequestDto(String name, BigDecimal price, List<SplitRequestDto> splits) {}

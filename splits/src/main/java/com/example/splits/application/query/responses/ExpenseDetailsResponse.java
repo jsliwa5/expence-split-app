@@ -11,6 +11,7 @@ public record ExpenseDetailsResponse(
         UUID payerId,
         String description,
         BigDecimal totalAmount,
+        String receiptUrl, // <-- NOWE POLE (może być null)
         LocalDateTime createdAt,
         List<ItemDetailsResponse> items
 ) {

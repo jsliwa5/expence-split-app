@@ -10,6 +10,7 @@ public record UpdateExpenseCommand(
         UUID editorId,
         String description,
         BigDecimal totalAmount,
+        String receiptUrl,
         List<ItemCommandDto> items
 ) implements Command<Void> {
 
